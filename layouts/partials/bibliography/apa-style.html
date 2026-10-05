@@ -21,6 +21,9 @@
   {{- $totalAuthors := len $authors -}}
   {{- range $authorIndex, $author := $authors -}}
   <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+    {{- with $author.literal -}}{{/* Single-field name, e.g. an organisation. */}}
+    <span itemprop="name">{{ . }}</span>
+    {{- end -}}
     {{- with $author.family -}}
     <span itemprop="familyName">{{ . }}</span>
     {{- end -}}
@@ -48,6 +51,9 @@
   {{- $totalEditors := len $editors -}}
   {{- range $editorIndex, $editor := $editors -}}
   <span itemprop="editor" itemscope itemtype="https://schema.org/Person">
+    {{- with $editor.literal -}}{{/* Single-field name, e.g. an organisation. */}}
+    <span itemprop="name">{{ . }}</span>
+    {{- end -}}
     {{- with $editor.family -}}
     <span itemprop="familyName">{{ . }}</span>
     {{- end -}}
@@ -89,11 +95,11 @@
     (<span itemprop="datePublished">
     {{- range (index .issued "date-parts") -}}
     {{- index . 0 -}}{{/* year */}}
-    {{- if (index . 1) -}}
-    ,&#32;{{- index . 1 -}}{{/* month */}}
+    {{- if gt (len .) 1 -}}
+    ,&#32;{{- /* month, always as an English name */ -}}{{- index (slice "January" "February" "March" "April" "May" "June" "July" "August" "September" "October" "November" "December") (sub (int (index . 1)) 1) -}}
     {{- end }}
-    {{- with index . 2 -}}
-    /{{- . }}{{/* day */}}
+    {{- if gt (len .) 2 -}}
+    &#32;{{- int (index . 2) }}{{/* day */}}
     {{- end -}}
     {{- end -}}
     </span>)
@@ -271,9 +277,20 @@
 <span itemscope
       itemtype="https://schema.org/WebPage"
       data-type="webpage">
-  {{- template "authorPart" . -}}
-
+  {{- template "authorPart" . }}
+  &#32;
   {{- template "issuedFullPart" . -}}.
+  {{- if .title -}}
+  &#32;<span itemprop="name">
+    <i>{{/* italicize title */}}
+      {{- .title | markdownify -}}
+    </i></span>.
+  {{- end -}}
+  {{- $siteName := index . "container-title" -}}
+  {{- with .author }}{{ with index . 0 }}{{ if eq .literal $siteName }}{{ $siteName = "" }}{{ end }}{{ end }}{{ end -}}
+  {{- with $siteName -}}{{/* APA omits the site name when it matches the author */}}
+  &#32;<span itemprop="isPartOf">{{- . -}}</span>.
+  {{- end -}}
 
   {{- template "DOIPart" . -}}
 </span>

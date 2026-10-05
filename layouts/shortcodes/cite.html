@@ -149,6 +149,9 @@
                     {{- with $author.family -}}
                       <span itemprop="familyName">{{ . | markdownify }}</span>
                     {{- end -}}
+                    {{- with $author.literal -}}
+                      <span itemprop="name">{{ . | markdownify }}</span>
+                    {{- end -}}
                   </span>
                   {{- end -}}{{/*custom code line*/}}
                   {{- if and (eq $authorIndex 0) (gt (len $displayAuthors) 2) -}}
