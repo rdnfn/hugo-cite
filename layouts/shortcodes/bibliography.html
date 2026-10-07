@@ -72,6 +72,23 @@
 {{- if $citedOnly }}{{/* Render cited references only */}}
 
   {{ $references = $.Page.Scratch.Get "citedBib" }}
+  {{- /* CUSTOMIZED PART START: also include cites that have not run yet.
+    Hugo expands shortcodes in the order of the rendered output, so a cite in a footnote
+    (rendered after the bibliography) has not added itself to citedBib at this point.
+    Collect the cite keys from the page source instead, parsed like the cite shortcode does
+    (leading "-" suppresses the author, ";" separates keys). */}}
+  {{- $bib := dict }}
+  {{- with resources.Get "bibliography.json" }}{{ $bib = . | transform.Unmarshal }}{{ end }}
+  {{- range findRESubmatch "{{[<%]-?\\s*cite\\s+(?:key\\s*=\\s*)?(?:\"([^\"]*)\"|`([^`]*)`|([^\\s\"`>%]+))" $.Page.RawContent }}
+    {{- $arg := delimit (after 1 .) "" | replaceRE "^-(.+)" "$1" }}
+    {{- range split $arg ";" }}
+      {{- $key := . }}
+      {{- range where $bib "id" "eq" $key }}
+        {{- $references = merge ($references | default dict) (dict $key .) }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+  {{- /* CUSTOMIZED PART END */}}
 
 {{- else }}{{/* Render the full bibliography */}}
 
