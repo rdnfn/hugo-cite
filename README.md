@@ -87,6 +87,7 @@ There are two shortcodes you can use in your content:
 
 - **`{{< bibliography >}}`**: display a list of works.
 - **`{{< cite >}}`**: render an in-text citation.
+- **`{{< fullcite >}}`**: render the full citation of one work in place.
 
 ### Display a bibliography
 
@@ -269,6 +270,22 @@ Works with pagination too, **in the matching order** of the citation keys:
 ```
 
 The above would render `(Lessig, 2002, pp. 5-6; Nussbaum, 2011; Dewey, 1938, p. 25)`.
+
+### Render a full citation in place
+
+Use the `{{< fullcite >}}` shortcode to render the full citation of one work (authors, year, title, venue, DOI or URL) where the shortcode is, in the same style as the bibliography entries. This is useful for a further reading list:
+
+```markdown
+<!-- Markdown -->
+
+## Further reading
+
+- {{< fullcite "Lessig 2002" >}}
+- {{< fullcite "Nussbaum2011" >}} A short note on why it is worth reading.
+```
+
+The key must match an ID in your CSL-JSON file (named param: `{{< fullcite key="Lessig 2002" >}}`).
+Works rendered this way are not added to the cited works, so they are not listed by `{{< bibliography cited >}}` unless they are also cited with `{{< cite >}}`.
 
 ## Cited Works
 
