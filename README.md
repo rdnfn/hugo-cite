@@ -43,13 +43,16 @@ theme:
 - hugo-cite
 ```
 
-### 3. Add CSS
+### 3. Add CSS and JS
 
-Reference the CSS somewhere in your HTML templates:
+Reference the CSS and JS somewhere in your HTML templates:
 
 ```html
 <link rel="stylesheet" type="text/css" href="{{ "/hugo-cite.css" | relURL }}" />
+<script src="{{ "/hugo-cite.js" | relURL }}" defer></script>
 ```
+
+The JS keeps the citation pop-ups inside the viewport. Without it, a pop-up near the right edge makes the page scroll sideways.
 
 ## Usage
 
