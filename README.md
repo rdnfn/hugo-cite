@@ -212,17 +212,19 @@ He is not an artist, or a professional writer.
 He is a programmer. {{< cite "Lessig 2002" >}}
 ```
 
-#### Suppress Author
+#### Textual Citation
 
-For an abbreviated in-text citation form, you can add a **dash** (`-`) at the beginning of your citation key:
+To use the author's name in the sentence, with only the year in brackets (like natbib's `\citet`), use the `{{< citet >}}` shortcode. It takes the same parameters as `{{< cite >}}`:
 
 ```markdown
 <!-- Markdown -->
 
-{{< cite "-Lessig 2002" >}}
+{{< citet "Lessig 2002" >}} argues that…
 ```
 
-The above would render `(2002)` rather than `(Lessig, 2002)`.
+The above would render `Lessig (2002) argues that…` rather than `(Lessig, 2002)`. With several keys, each gets its own brackets: `{{< citet "Lessig2002;Dewey1938" >}}` renders `Lessig (2002); Dewey (1938)`.
+
+For backwards compatibility, adding a **dash** (`-`) at the beginning of the first citation key of `{{< cite >}}` does the same (`{{< cite "-Lessig 2002" >}}`), as does the named param `suppressAuthor=true`.
 
 #### Cite a Page
 

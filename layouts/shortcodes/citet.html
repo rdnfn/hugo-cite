@@ -1,0 +1,8 @@
+{{- /*
+
+  Textual citation (like natbib's \citet), e.g. {{< citet "Faure1909" >}}
+  renders Faure (1909). Same as {{< cite "-Faure1909" >}}, which still works.
+  The template is in partials/bibliography/cite.html.
+
+*/ -}}
+{{- partial "bibliography/cite.html" . -}}
