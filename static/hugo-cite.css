@@ -11,36 +11,55 @@
   /*font-size: .85em; /* reduce to avoid some breaks */
 }
 
+/* Colours: set --cite-bg (a translucent tint) and --cite-color (the border)
+/* on the site to match its other boxes.
+/* Hidden pop-ups are display: none, so they take up no space and can never
+/* widen the page, even without hugo-cite.js. */
 .hugo-cite-group .hugo-cite-citation {
-  visibility: hidden;
-  background-color: var(--theme);
-  /* #ffffff; */
+  display: none;
+  /* tint over the page colour, so text behind the pop-up doesn't show through */
+  background: linear-gradient(var(--cite-bg, transparent), var(--cite-bg, transparent)), var(--theme, #fff);
   color: inherit;
-  border: 1px solid currentColor;
-  padding: 1rem;
+  border: 2px solid var(--cite-color, currentColor);
+  border-radius: var(--radius, 0);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+  padding: 8px 12px;
+  font-size: 0.9em;
   position: absolute;
   width: 350px;
   /* minus the margin hugo-cite.js keeps on each side */
   max-width: calc(100vw - 16px);
-  z-index: 1;
   bottom: 140%;
   left: 0;
   margin-left: -50px;
-
   z-index: 2;
+  /* allow-discrete keeps it shown while fading out, so the mouse can still
+  /* move from the citation up into the pop-up */
   transition:
-    visibility 0s .3s,
-    transform .3s ease 0s,
-    opacity .3s ease 0s;
+    display .3s allow-discrete,
+    transform .3s ease,
+    opacity .3s ease;
   opacity: 0;
   transform: translateY(-8px);
 }
 
-.hugo-cite-group:hover .hugo-cite-citation {
-  visibility: visible;
-  transition: visibility 0s 0s, transform .3s, opacity .3s;
-  opacity: 1;
-  transform: translateY(0);
+/* Only shown on hover where there is hover: on touch screens it would stick
+/* around after the tap that follows the link. Sites can show the text on
+/* tap instead. */
+@media not all and (hover: none) {
+  .hugo-cite-group:hover .hugo-cite-citation {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* fade in from the hidden state */
+  @starting-style {
+    .hugo-cite-group:hover .hugo-cite-citation {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+  }
 }
 
 /* Visually Hidden utility class */
