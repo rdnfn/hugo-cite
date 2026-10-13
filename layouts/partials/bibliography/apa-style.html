@@ -191,9 +191,10 @@
   &#32;
   {{- if .title -}}
   <span itemprop="name">
-    {{- .title | markdownify -}}
-    {{- if .subtitle }}: {{ .subtitle | markdownify }}{{- end -}}
-  </span>.
+    <i>{{/* italicize title */}}
+      {{- .title | markdownify -}}
+      {{- if .subtitle }}: {{ .subtitle | markdownify }}{{- end -}}
+    </i></span>.
   {{- end -}}
 
   {{- if isset . "container-title" -}}
@@ -244,8 +245,9 @@
   &#32;
   {{- if .title -}}
   <span itemprop="name">
-    {{- .title | markdownify -}}
-  </span>.
+    <i>{{/* italicize title */}}
+      {{- .title | markdownify -}}
+    </i></span>.
   {{- end -}}
 
   {{- if isset . "container-title" -}}
@@ -306,8 +308,9 @@
   &#32;
   {{- if .title -}}
   <span itemprop="name">
-    {{- .title | markdownify -}}
-  </span>
+    <i>{{/* italicize title */}}
+      {{- .title | markdownify -}}
+    </i></span>
   {{- end -}}
 {{- if isset . "genre" -}}<span itemprop="genre">&nbsp;[{{- index . "genre" -}}]</span>
     {{- end -}}.&nbsp;
