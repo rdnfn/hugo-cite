@@ -1,0 +1,40 @@
+{{- /*
+
+  Citation label and sort key of a work, as in natbib's plainnat.bst.
+
+  Context: a CSL-JSON reference. Returns a map with:
+  - names: the authors as shown in the text, e.g. "Paul", "Doe & Roe" or
+    "Paul et al." (editors if there are no authors)
+  - year: the first year, or "" if undated
+  - sort: the reference list order (plainnat's sort.label): full author list
+    (family name, then given name), then year, then citation key. With more
+    than two authors, the first author and year come before the other names.
+
+*/ -}}
+
+{{- $people := .author | default .editor -}}
+{{- $year := "" -}}
+{{- with .issued }}{{ with index . "date-parts" }}{{ with index . 0 }}{{ $year = index . 0 | string }}{{ end }}{{ end }}{{ end -}}
+
+{{- $short := slice -}}
+{{- $sort := slice -}}
+{{- range $i, $p := $people -}}
+  {{- $short = $short | append ($p.family | default $p.literal) -}}
+  {{- $name := delimit (slice (index $p "dropping-particle" | default "") (index $p "non-dropping-particle" | default "") ($p.family | default $p.literal)) " " | strings.TrimSpace -}}
+  {{- with $p.given }}{{ $name = printf "%s  %s" $name . }}{{ end -}}
+  {{- with $p.suffix }}{{ $name = printf "%s  %s" $name . }}{{ end -}}
+  {{- if and (gt (len $people) 2) (eq $i 1) }}{{ $name = printf "zz%s   %s" $year $name }}{{ end -}}
+  {{- $sort = $sort | append $name -}}
+{{- end -}}
+
+{{- $names := i18n "apa_no_author_abbr" | default "n.a." | upper -}}
+{{- if gt (len $short) 2 -}}
+  {{- $names = printf "%s et al." (index $short 0) -}}
+{{- else if $short -}}
+  {{- $names = delimit $short " & " -}}
+{{- end -}}
+
+{{- $sortKey := printf "%s    %s" (delimit $sort "   ") $year | replaceRE `[-~]` " " | replaceRE `[^\p{L}\p{N}\s]` "" | lower -}}
+{{- $sortKey = printf "%s    %s" $sortKey .id -}}
+
+{{- return dict "names" $names "year" $year "sort" $sortKey -}}

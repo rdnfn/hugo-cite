@@ -83,12 +83,12 @@
     {{- range $index, $dateParts := (index .issued "date-parts") -}}
     {{- if gt $index 0 -}}, {{ end -}}{{/* Separate other years by comma */}}
     {{- range first 1 $dateParts -}}{{/* First element in date-part is the year */}}
-    {{- . -}}
+    {{- . -}}{{ if eq $index 0 }}{{ index $ "year-suffix" }}{{ end }}{{/* e.g. 2024a, see suffixes.html */}}
     {{- end -}}
     {{- end -}}
     </span>)
   {{- else }}
-  ({{ i18n "apa_no_date_abbr" | default "n.d." }}){{/* no date */}}
+  ({{ i18n "apa_no_date_abbr" | default "n.d." }}{{ with index . "year-suffix" }}-{{ . }}{{ end }}){{/* no date, e.g. n.d.-a */}}
   {{- end }}
 {{- end }}{{/* END issued */}}
 
@@ -96,8 +96,8 @@
 {{- define "issuedFullPart" }}
   {{- if and (isset . "issued") (isset .issued "date-parts") -}}
     (<span itemprop="datePublished">
-    {{- range (index .issued "date-parts") -}}
-    {{- index . 0 -}}{{/* year */}}
+    {{- range $index, $dateParts := (index .issued "date-parts") -}}
+    {{- index . 0 -}}{{ if eq $index 0 }}{{ index $ "year-suffix" }}{{ end }}{{/* year, suffix e.g. 2024a */}}
     {{- if gt (len .) 1 -}}
     ,&#32;{{- /* month, always as an English name */ -}}{{- index (slice "January" "February" "March" "April" "May" "June" "July" "August" "September" "October" "November" "December") (sub (int (index . 1)) 1) -}}
     {{- end }}
@@ -107,7 +107,7 @@
     {{- end -}}
     </span>)
   {{- else }}
-  (s.d.){{/* no date */}}
+  ({{ i18n "apa_no_date_abbr" | default "n.d." }}{{ with index . "year-suffix" }}-{{ . }}{{ end }}){{/* no date, e.g. n.d.-a */}}
   {{- end }}
 {{- end }}{{/* END issued */}}
 

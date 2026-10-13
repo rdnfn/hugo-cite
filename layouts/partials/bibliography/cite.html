@@ -111,6 +111,24 @@
 
 
 {{- /* -------------------- END Bibliography path -------------------- */ -}}
+{{- $suffixes := partialCached "bibliography/suffixes.html" $.Page $.Page.Path $.Page.Lang -}}
+
+{{- /* As in natbib, a work by the same authors (as shown) as the one cited just before
+  it shows only its year, e.g. (Paul, 2023, 2024), or only its letter if the year is
+  the same too, e.g. (Paul, 2024a,b). Pages end the run: (Paul, 2024a, p. 5; Paul, 2024b). */ -}}
+{{- $info := slice -}}
+{{- $prev := dict -}}
+{{- range $keyIndex, $key := $keys -}}
+  {{- $cur := dict -}}
+  {{- range first 1 (where $bibliography "id" "eq" $key) -}}
+    {{- $label := partialCached "bibliography/label.html" . .id -}}
+    {{- $suffix := index . "year-suffix" | default (index $suffixes $key) | default "" -}}
+    {{- $merged := and (eq $label.names $prev.names) (not $prev.pages) -}}
+    {{- $cur = dict "names" $label.names "year" $label.year "suffix" $suffix "pages" (index $pages $keyIndex) "merged" $merged "short" (and $merged $suffix $label.year (eq $label.year $prev.year)) -}}
+  {{- end -}}
+  {{- $info = $info | append $cur -}}
+  {{- $prev = $cur -}}
+{{- end -}}
 <!--custom code -->
   <span class="hugo-cite-intext"
         itemprop="citation">{{- if not $suppressAuthor -}}({{- end -}}
@@ -129,12 +147,17 @@
           {{- /* Add to the collection of cited references */ -}}
           {{- $.Page.Scratch.SetInMap "citedBib" $key $currentRef -}}
 
+          {{- $cur := index $info $keyIndex -}}
+          {{- $next := dict -}}
+          {{- if lt (add 1 $keyIndex) $totalRefs }}{{ $next = index $info (add 1 $keyIndex) }}{{ end -}}
           <a href="#{{- $key | urlize -}}">
             {{- /* <span class="visually-hidden">Citation: </span> */ -}}
             {{- $reference := . -}}
+            {{- with index $suffixes $key }}{{ $reference = merge (dict "year-suffix" .) $reference }}{{ end -}}
 
             {{- /* -------------------- BEGIN Display authors -------------------- */ -}}
             <!--custom code line removed -->
+              {{- if not $cur.merged -}}
               {{- $displayAuthors := $reference.author -}}
               {{- if not $reference.author -}}
                 {{- $displayAuthors = $reference.editor -}}
@@ -175,15 +198,21 @@
               &#32;(
               {{- end -}}
               <!--custom code end --><!--custom code line removed -->
+              {{- end -}}
             {{- /* -------------------- END Display authors -------------------- */ -}}
-            {{- if and (isset $reference "issued") (isset $reference.issued "date-parts") -}}
+            {{- if $cur.short -}}
+              {{- $cur.suffix -}}
+            {{- else if and (isset $reference "issued") (isset $reference.issued "date-parts") -}}
               {{- range $index, $dateParts := (index .issued "date-parts") -}}{{- /* range of dates */ -}}
                 {{- range first 1 $dateParts -}}{{/* First element in date-part is the year */ -}}
                 <span itemprop="datePublished">
                   {{- . -}}
                 </span>
+                {{- if eq $index 0 }}{{ index $reference "year-suffix" }}{{ end -}}
                 {{- end -}}
               {{- end -}}
+            {{- else -}}
+              {{- i18n "apa_no_date_abbr" | default "n.d." -}}{{ with $cur.suffix }}-{{ . }}{{ end }}
             {{- end -}}
             {{- $currentPages := index $pages $keyIndex -}}
             {{- with $currentPages -}},&#32;
@@ -193,14 +222,15 @@
             {{- end -}}
             {{- $formatedPages }}{{- end -}}
             {{- /* Without authors in brackets, each citation closes its own bracket */ -}}
-            {{- if $suppressAuthor -}}){{- end -}}
+            {{- if and $suppressAuthor (not $next.merged) -}}){{- end -}}
           </a>
 
           {{- /* Eliminate space between css-hidden citation hover block */ -}}
 
           <span class="hugo-cite-citation"> {{ partial $partialPath $reference }}</span></span>
 
-        {{- if lt (add 1 $keyIndex) $totalRefs -}};&#32;{{- end -}}
+        {{- if $next.merged -}},{{ if not $next.short }}&#32;{{ end }}
+        {{- else if lt (add 1 $keyIndex) $totalRefs -}};&#32;{{- end -}}
 
       {{- else -}}
 

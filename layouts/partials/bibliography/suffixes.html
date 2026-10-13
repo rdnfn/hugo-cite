@@ -1,0 +1,59 @@
+{{- /*
+
+  Year suffixes, as in natbib's plainnat.bst: works on the page whose in-text
+  citations would otherwise look the same (same authors as shown in the text,
+  same year) get a, b, c ... after the year, e.g. Paul (2024a) and Paul (2024b).
+  The same suffix is shown in the bibliography entry, e.g. Paul, A. (2024a).
+
+  Letters follow the reference list order (see label.html): full author list,
+  then year, then citation key. Undated works are shown as n.d.-a, n.d.-b ...
+
+  The works on the page are those used by cite, citet and fullcite, or the
+  whole bibliography if the page has a {{< bibliography >}} without "cited".
+  A work with a "year-suffix" in the CSL-JSON file keeps it.
+
+  Context: the page. Returns a map from citation key to suffix.
+  Call with partialCached, e.g. partialCached "bibliography/suffixes.html" .Page .Page.Path .Page.Lang
+
+*/ -}}
+
+{{- $bib := slice -}}
+{{- with resources.Get "bibliography.json" -}}
+  {{- $bib = . | transform.Unmarshal -}}
+{{- end -}}
+
+{{- $works := $bib -}}
+{{- $full := false -}}
+{{- range findRESubmatch `{{[<%]-?\s*bibliography\b([^>%]*)` .RawContent -}}
+  {{- if not (strings.Contains (index . 1) "cited") }}{{ $full = true }}{{ end -}}
+{{- end -}}
+{{- if not $full -}}
+  {{- /* Parsed like the cite shortcode does (leading "-" suppresses the author, ";" separates keys) */ -}}
+  {{- $keys := slice -}}
+  {{- range findRESubmatch "{{[<%]-?\\s*(?:cite|citet|fullcite)\\s+(?:key\\s*=\\s*)?(?:\"([^\"]*)\"|`([^`]*)`|([^\\s\"`>%]+))" .RawContent -}}
+    {{- $arg := delimit (after 1 .) "" | replaceRE "^-(.+)" "$1" -}}
+    {{- $keys = $keys | append (split $arg ";") -}}
+  {{- end -}}
+  {{- $works = where $bib "id" "in" $keys -}}
+{{- end -}}
+
+{{- /* Group the works by their in-text citation, e.g. "Paul et al. 2024" */ -}}
+{{- $groups := newScratch -}}
+{{- range $works -}}
+  {{- $label := partialCached "bibliography/label.html" . .id -}}
+  {{- $groups.Add (printf "%s\x00%s" $label.names $label.year) (slice (dict "id" .id "k" $label.sort)) -}}
+{{- end -}}
+
+{{- $letters := split "abcdefghijklmnopqrstuvwxyz" "" -}}
+{{- $suffixes := dict -}}
+{{- range $groups.Values -}}
+  {{- if gt (len .) 1 -}}
+    {{- range $i, $work := sort . "k" -}}
+      {{- $suffix := index $letters (mod $i 26) -}}
+      {{- if ge $i 26 }}{{ $suffix = printf "%s%s" (index $letters (sub (div $i 26) 1)) $suffix }}{{ end -}}
+      {{- $suffixes = merge $suffixes (dict $work.id $suffix) -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- return $suffixes -}}

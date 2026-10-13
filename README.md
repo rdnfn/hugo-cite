@@ -275,6 +275,14 @@ Works with pagination too, **in the matching order** of the citation keys:
 
 The above would render `(Lessig, 2002, pp. 5-6; Nussbaum, 2011; Dewey, 1938, p. 25)`.
 
+#### Same Author and Year
+
+This follows natbib's author-year style (`plainnat.bst` and `natbib.sty`), and is done automatically:
+
+- When two works on a page would get the same in-text citation (same authors as shown in the text, e.g. `Paul et al.`, and same year), a letter is added after the year: `Paul et al. (2024a)` and `Paul et al. (2024b)`. Undated works get `n.d.-a`, `n.d.-b`. The letter is also shown in the popup, the bibliography and `{{< fullcite >}}`. Only the works used on the page count (or the whole file with `{{< bibliography >}}` without `cited`). A `year-suffix` set in the CSL-JSON file takes precedence.
+- The bibliography is sorted by full author list (family, then given names), then year, then citation key. With more than two authors, the first author and year come before the other names. Letters follow this order.
+- Citing the same authors several times in a row does not repeat them: `{{< cite "paul2023;paul2024a;paul2024b" >}}` renders `(Paul, 2023, 2024a,b)` and `{{< citet "paul2024a;paul2024b" >}}` renders `Paul (2024a,b)`. Keys keep the order given. A page number ends the run: `(Paul, 2024a, p. 5; Paul, 2024b)`.
+
 ### Render a full citation in place
 
 Use the `{{< fullcite >}}` shortcode to render the full citation of one work (authors, year, title, venue, DOI or URL) where the shortcode is, in the same style as the bibliography entries. This is useful for a further reading list:

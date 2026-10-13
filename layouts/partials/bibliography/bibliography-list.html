@@ -32,13 +32,19 @@
 
 {{/* -------------------- 2. BEGIN REFERENCES BLOCK -------------------- */}}
 {{- $references := .references }}
+{{- $suffixes := dict }}
+{{- with .page }}{{ $suffixes = partialCached "bibliography/suffixes.html" . .Path .Lang }}{{ end }}
+{{- /* Sorted as in natbib's plainnat.bst, see label.html */}}
+{{- $sorted := slice }}
+{{- range $references }}{{ $sorted = $sorted | append (dict "k" (partialCached "bibliography/label.html" . .id).sort "ref" .) }}{{ end }}
 
 {{ if $references }}
 <section class="hugo-cite-bibliography">
   <ol>
     {{/* -------------------- BEGIN RANGE BIBLIOGRAPHY -------------------- */}}
-    {{- range $refIndex, $refObject := $references -}}
-      {{- $currentRef := index $references $refIndex }}
+    {{- range sort $sorted "k" -}}
+      {{- $currentRef := .ref }}
+      {{- with index $suffixes $currentRef.id }}{{ $currentRef = merge (dict "year-suffix" .) $currentRef }}{{ end }}
 
       {{- $partialPath := string (printf "bibliography/%s-style.html" $citationStyle) }}
 

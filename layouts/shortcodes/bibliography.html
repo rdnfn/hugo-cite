@@ -79,7 +79,7 @@
     (leading "-" suppresses the author, ";" separates keys). */}}
   {{- $bib := dict }}
   {{- with resources.Get "bibliography.json" }}{{ $bib = . | transform.Unmarshal }}{{ end }}
-  {{- range findRESubmatch "{{[<%]-?\\s*cite\\s+(?:key\\s*=\\s*)?(?:\"([^\"]*)\"|`([^`]*)`|([^\\s\"`>%]+))" $.Page.RawContent }}
+  {{- range findRESubmatch "{{[<%]-?\\s*citet?\\s+(?:key\\s*=\\s*)?(?:\"([^\"]*)\"|`([^`]*)`|([^\\s\"`>%]+))" $.Page.RawContent }}
     {{- $arg := delimit (after 1 .) "" | replaceRE "^-(.+)" "$1" }}
     {{- range split $arg ";" }}
       {{- $key := . }}
@@ -120,5 +120,5 @@
 
 {{- end }}
 
-{{- $bibParams := dict "references" $references }}
+{{- $bibParams := dict "references" $references "page" $.Page }}
 {{- partial "bibliography/bibliography-list.html" $bibParams }}

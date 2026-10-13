@@ -31,8 +31,12 @@
   {{- errorf "Unable to get resource %q" "bibliography.json" -}}
 {{- end -}}
 
+{{- $suffixes := partialCached "bibliography/suffixes.html" .Page .Page.Path .Page.Lang -}}
+
 {{- range first 1 (where $bib "id" "eq" $key) -}}
-<span class="hugo-cite-full">{{ partial (printf "bibliography/%s-style.html" $citationStyle) . | strings.TrimSpace | safeHTML }}</span>
+{{- $ref := . -}}
+{{- with index $suffixes $key }}{{ $ref = merge (dict "year-suffix" .) $ref }}{{ end -}}
+<span class="hugo-cite-full">{{ partial (printf "bibliography/%s-style.html" $citationStyle) $ref | strings.TrimSpace | safeHTML }}</span>
 {{- else -}}
 <span style="background-color: #f00; color: #fff;">No matching key was found for `{{ $key }}` in the references. Please make sure to provide an available ID in your `bib.json` file.</span>
 {{- end -}}
