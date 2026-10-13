@@ -193,11 +193,10 @@
   {{- template "issuedPart" . }}.
   &#32;
   {{- if .title -}}
-  <span itemprop="name">
-    <i>{{/* italicize title */}}
-      {{- .title | markdownify -}}
-      {{- if .subtitle }}: {{ .subtitle | markdownify }}{{- end -}}
-    </i></span>.
+  <span itemprop="name"><i>
+    {{- .title | markdownify -}}
+    {{- if .subtitle }}: {{ .subtitle | markdownify }}{{- end -}}
+  </i></span>.
   {{- end -}}
 
   {{- if isset . "container-title" -}}
@@ -247,10 +246,9 @@
   {{- template "issuedPart" . }}.
   &#32;
   {{- if .title -}}
-  <span itemprop="name">
-    <i>{{/* italicize title */}}
-      {{- .title | markdownify -}}
-    </i></span>.
+  <span itemprop="name"><i>
+    {{- .title | markdownify -}}
+  </i></span>.
   {{- end -}}
 
   {{- if isset . "container-title" -}}
@@ -310,10 +308,9 @@
   {{- template "issuedPart" . }}.
   &#32;
   {{- if .title -}}
-  <span itemprop="name">
-    <i>{{/* italicize title */}}
-      {{- .title | markdownify -}}
-    </i></span>
+  <span itemprop="name"><i>
+    {{- .title | markdownify -}}
+  </i></span>
   {{- end -}}
 {{- if isset . "genre" -}}<span itemprop="genre">&nbsp;[{{- index . "genre" -}}]</span>
     {{- end -}}.&nbsp;
