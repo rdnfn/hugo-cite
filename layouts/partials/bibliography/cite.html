@@ -73,7 +73,7 @@
 
 
 {{- /* -------------------- BEGIN Citation style -------------------- */ -}}
-{{- $citationStyle := "apa" }}
+{{- $citationStyle := "arduinio" }}
 {{- if $.Site.Params.citationStyle }}
   {{- if templates.Exists (printf "partials/bibliography/%s-style.html" $.Site.Params.citationStyle) }}
     {{- $citationStyle = $.Site.Params.citationStyle }}

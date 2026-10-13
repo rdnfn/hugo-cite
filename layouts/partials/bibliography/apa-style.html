@@ -15,7 +15,7 @@
 */}}
 
 {{/* BEGIN author */}}
-{{- define "authorPart" }}
+{{- define "apa-authorPart" }}
   {{- $authors := .author }}
   {{- if $authors -}}
   {{- $totalAuthors := len $authors -}}
@@ -45,7 +45,7 @@
 {{- end -}}{{/* END author */}}
 
 {{/* BEGIN editor */}}
-{{- define "editorPart" }}
+{{- define "apa-editorPart" }}
   {{- $editors := .editor }}
   {{- if $editors -}}
   {{- $totalEditors := len $editors -}}
@@ -73,7 +73,7 @@
 {{- end -}}{{/* END editor */}}
 
 {{/* BEGIN issued (year of publication) */}}
-{{- define "issuedPart" }}
+{{- define "apa-issuedPart" }}
   {{- if and (isset . "issued") (isset .issued "date-parts") -}}
     {{/* range of dates */}}
     (<span itemprop="datePublished">
@@ -90,7 +90,7 @@
 {{- end }}{{/* END issued */}}
 
 {{/* BEGIN full issued (year, month day) */}}
-{{- define "issuedFullPart" }}
+{{- define "apa-issuedFullPart" }}
   {{- if and (isset . "issued") (isset .issued "date-parts") -}}
     (<span itemprop="datePublished">
     {{- range (index .issued "date-parts") -}}
@@ -109,12 +109,13 @@
 {{- end }}{{/* END issued */}}
 
 {{/* BEGIN DOI */}}
-{{- define "DOIPart" }}
+{{- define "apa-DOIPart" }}
   {{- if .DOI }}
   <a href="https://doi.org/{{ .DOI }}"
      itemprop="identifier"
      itemtype="https://schema.org/URL">https://doi.org/{{- .DOI -}}</a>
   {{- else if .URL }}&#32;
+  {{- i18n "apa_retrieved_from" | default "Retrieved from" -}}&#32;
   <a href="{{ .URL }}"
      itemprop="identifier"
      itemtype="https://schema.org/URL">{{ .URL }}</a>
@@ -123,7 +124,7 @@
 {{- /* END DOI*/ -}}
 
 {{/* BEGIN ArchivalID */}}
-{{- define "ArchivalID" }}
+{{- define "apa-ArchivalID" }}
   {{ if isset . "archive" -}}&#32;{{ i18n "archive_available_from" | default "Available from" }}
     <meta itemprop="Organization" itemtype="http://schema.org/Organization" itemscope>
     <span itemprop="name">{{- index . "archive" -}}</span>.
@@ -139,13 +140,13 @@
       itemtype="https://schema.org/Book"
       data-type="book">
   {{- if .author -}}
-  {{- template "authorPart" . -}}
+  {{- template "apa-authorPart" . -}}
   &#32;
   {{- else if .editor -}}{{/* Display editors if no authors*/}}
-  {{- template "editorPart" . -}}
+  {{- template "apa-editorPart" . -}}
   &#32;
   {{- end -}}
-  {{- template "issuedPart" . }}.
+  {{- template "apa-issuedPart" . }}.
   &#32;
   {{- if .title -}}
   <span itemprop="name">
@@ -176,7 +177,7 @@
     </span></span>.
   {{- end }}
 
-  {{- template "DOIPart" . -}}
+  {{- template "apa-DOIPart" . -}}
 </span>
 {{/* -------------------- END BOOK TYPE -------------------- */}}
 
@@ -185,22 +186,21 @@
 <span itemscope
       itemtype="https://schema.org/Chapter"
       data-type="chapter">
-  {{ template "authorPart" . }}
+  {{ template "apa-authorPart" . }}
   &#32;
-  {{- template "issuedPart" . }}.
+  {{- template "apa-issuedPart" . }}.
   &#32;
   {{- if .title -}}
   <span itemprop="name">
-    <i>{{/* italicize title */}}
-      {{- .title | markdownify -}}
-      {{- if .subtitle }}: {{ .subtitle | markdownify }}{{- end -}}
-    </i></span>.
+    {{- .title | markdownify -}}
+    {{- if .subtitle }}: {{ .subtitle | markdownify }}{{- end -}}
+  </span>.
   {{- end -}}
 
   {{- if isset . "container-title" -}}
   &#32;{{- i18n "apa_in" | default "In" -}}
   {{- if .editor -}}
-  {{- template "editorPart" . }} (Eds.),&#32;
+  {{- template "apa-editorPart" . }} (Eds.),&#32;
   {{- end -}}
 
   <span itemprop="about">
@@ -230,7 +230,7 @@
       </span></span>.
   {{- end }}
 
-  {{- template "DOIPart" . -}}
+  {{- template "apa-DOIPart" . -}}
 </span>
 {{/* -------------------- END CHAPTER TYPE -------------------- */}}
 
@@ -239,21 +239,20 @@
 <span itemscope
       itemtype="https://schema.org/Article"
       data-type="article">
-  {{- template "authorPart" . }}
+  {{- template "apa-authorPart" . }}
   &#32;
-  {{- template "issuedPart" . }}.
+  {{- template "apa-issuedPart" . }}.
   &#32;
   {{- if .title -}}
   <span itemprop="name">
-    <i>{{/* italicize title */}}
-      {{- .title | markdownify -}}
-    </i></span>.
+    {{- .title | markdownify -}}
+  </span>.
   {{- end -}}
 
   {{- if isset . "container-title" -}}
   {{- if .editor -}}{{/* Add `In` before name of Eds. and title*/}}
   &#32;{{- i18n "apa_in" | default "In" -}}&#32;
-  {{- template "editorPart" . }} (Eds.),&#32;
+  {{- template "apa-editorPart" . }} (Eds.),&#32;
   {{- end -}}
 
   <i>{{/* italicize journal title */}}
@@ -269,7 +268,7 @@
   &#32;<span itemprop="pagination">{{ replace .page "-" "–" }}</span>.
   {{- end -}}
 
-  {{- template "DOIPart" . -}}
+  {{- template "apa-DOIPart" . -}}
 </span>
 {{/* -------------------- END ARTICLE TYPE -------------------- */}}
 
@@ -278,9 +277,9 @@
 <span itemscope
       itemtype="https://schema.org/WebPage"
       data-type="webpage">
-  {{- template "authorPart" . }}
+  {{- template "apa-authorPart" . }}
   &#32;
-  {{- template "issuedFullPart" . -}}.
+  {{- template "apa-issuedFullPart" . -}}.
   {{- if .title -}}
   &#32;<span itemprop="name">
     <i>{{/* italicize title */}}
@@ -293,7 +292,7 @@
   &#32;<span itemprop="isPartOf">{{- . -}}</span>.
   {{- end -}}
 
-  {{- template "DOIPart" . -}}
+  {{- template "apa-DOIPart" . -}}
 </span>
 {{/* -------------------- END WEBPAGE TYPE -------------------- */}}
 
@@ -302,15 +301,14 @@
 <span itemscope
       itemtype="https://schema.org/BlogPosting"
       data-type="blog">
-  {{- template "authorPart" . }}
+  {{- template "apa-authorPart" . }}
   &#32;
-  {{- template "issuedPart" . }}.
+  {{- template "apa-issuedPart" . }}.
   &#32;
   {{- if .title -}}
   <span itemprop="name">
-    <i>{{/* italicize title */}}
-      {{- .title | markdownify -}}
-    </i></span>
+    {{- .title | markdownify -}}
+  </span>
   {{- end -}}
 {{- if isset . "genre" -}}<span itemprop="genre">&nbsp;[{{- index . "genre" -}}]</span>
     {{- end -}}.&nbsp;
@@ -318,7 +316,7 @@
   {{- if isset . "container-title" -}}
   {{- if .editor -}}{{/* Add `In` before name of Eds. and title*/}}
   &#32;{{- i18n "apa_in" | default "In" -}}&#32;
-  {{- template "editorPart" . }} (Eds.),&#32;
+  {{- template "apa-editorPart" . }} (Eds.),&#32;
   {{- end -}}
 
 <span itemprop="isPartOf">
@@ -332,7 +330,7 @@
   {{- if isset . "page" -}}
   &#32;<span itemprop="pagination">{{ replace .page "-" "–" }}</span>.
   {{- end -}}
-  {{- template "DOIPart" . -}}
+  {{- template "apa-DOIPart" . -}}
 </span>
 {{/* -------------------- END BLOGPOST TYPE -------------------- */}}
 
@@ -341,9 +339,9 @@
 <span itemscope
       itemtype="https://schema.org/Thesis"
       data-type="thesis">
-  {{- template "authorPart" . }}
+  {{- template "apa-authorPart" . }}
   &#32;
-  {{- template "issuedPart" . }}.
+  {{- template "apa-issuedPart" . }}.
   &#32;
   {{- if .title -}}
   <span itemprop="name">
@@ -363,8 +361,8 @@
     <span itemprop="name">{{- . -}}{{- end -}}
     </span>{{ if isset . "publisher-place" -}},&#32; <span itemprop="location">{{- index . "publisher-place" -}}</span></span>.
   {{- end }}
-  {{- template "ArchivalID" . -}}
-  {{- template "DOIPart" . -}}
+  {{- template "apa-ArchivalID" . -}}
+  {{- template "apa-DOIPart" . -}}
 </span>
 {{/* -------------------- END DEGREE WORK TYPE -------------------- */}}
 
@@ -373,9 +371,9 @@
 <span itemscope
       itemtype="https://schema.org/Report"
       data-type="report">
-  {{- template "authorPart" . }}
+  {{- template "apa-authorPart" . }}
   &#32;
-  {{- template "issuedPart" . }}.
+  {{- template "apa-issuedPart" . }}.
   &#32;
   {{- if .title -}}
   <span itemprop="name">
@@ -396,8 +394,8 @@
       {{- . -}}{{- end -}}
     </span> {{ if isset . "publisher-place" -}}:&#32; <span itemprop="location">{{- index . "publisher-place" -}}</span></span>.
   {{- end }}
-  {{- template "ArchivalID" . -}}
-  {{- template "DOIPart" . -}}
+  {{- template "apa-ArchivalID" . -}}
+  {{- template "apa-DOIPart" . -}}
 </span>
 {{/* -------------------- END REPORT TYPE -------------------- */}}
 
@@ -406,9 +404,9 @@
 <span itemscope
       itemtype="https://schema.org/CreativeWork"
       data-type="{{ .type | default "default" }}">
-  {{- template "authorPart" . }}
+  {{- template "apa-authorPart" . }}
   &#32;
-  {{- template "issuedPart" . }}.
+  {{- template "apa-issuedPart" . }}.
   &#32;
   {{- if .title -}}
   <span itemprop="name">
@@ -431,7 +429,7 @@
     </span></span>.
   {{- end }}
 
-  {{- template "DOIPart" . -}}
+  {{- template "apa-DOIPart" . -}}
 </span>
 {{- end -}}
 {{/* -------------------- END DEFAULT APA -------------------- */}}

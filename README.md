@@ -6,8 +6,10 @@
 
 ---
 
-⚠️ **Important note: APA is the only citation style currently available, and you must be aware that it does not match the entire APA spec.**  
-More styles may be added eventually (contributions welcome!), but given that they are extremely verbose to implement, this is unlikely to happen in a near future.
+⚠️ **Note: this fork has two citation styles, set with `citationStyle` in the site params:**
+
+- `arduinio` (default): based on APA but adapted for arduin.io (e.g. titles always in italics, no "Retrieved from" before URLs), so it does not follow the APA spec.
+- `apa`: the original APA style. It does not match the entire APA spec either.
 
 ---
 

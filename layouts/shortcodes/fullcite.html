@@ -17,7 +17,7 @@
   {{- errorf "fullcite: missing citation key. Example: {{< fullcite \"Faure 1909\" >}} (%s)" .Position -}}
 {{- end -}}
 
-{{- $citationStyle := "apa" -}}
+{{- $citationStyle := "arduinio" -}}
 {{- with site.Params.citationStyle -}}
   {{- if templates.Exists (printf "partials/bibliography/%s-style.html" .) -}}
     {{- $citationStyle = . -}}
