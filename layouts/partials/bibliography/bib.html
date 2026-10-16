@@ -1,0 +1,27 @@
+{{- /*
+
+  The works in the CSL-JSON bibliography (bibliography.json in assets), each
+  citation key only once. If a key is listed more than once, its first entry
+  is used and the build warns, so a work is never cited or listed twice.
+
+  Context: any. Returns a slice of CSL-JSON references.
+  Call with partialCached, e.g. partialCached "bibliography/bib.html" .
+
+*/ -}}
+
+{{- $bib := slice -}}
+{{- with resources.Get "bibliography.json" -}}
+  {{- $ids := slice -}}
+  {{- range transform.Unmarshal . -}}
+    {{- if in $ids .id -}}
+      {{- warnf "bibliography.json: the key %q is listed more than once, only its first entry is used" .id -}}
+    {{- else -}}
+      {{- $ids = $ids | append .id -}}
+      {{- $bib = $bib | append . -}}
+    {{- end -}}
+  {{- end -}}
+{{- else -}}
+  {{- errorf "Unable to get resource %q" "bibliography.json" -}}
+{{- end -}}
+
+{{- return $bib -}}

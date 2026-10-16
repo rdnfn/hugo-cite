@@ -101,13 +101,7 @@
 
 {{- if gt (len $bibliographyPath) 0 -}}{{- /* Begin Bibliography Loop */ -}}
 {{/*  UPDATED {{- $bibliography := getJSON $bibliographyPath -}} getJSON was deprecated: see https://gohugo.io/functions/data/getjson/ */}}
-{{- $bibliography := dict -}}
-{{- $p := "bibliography.json" -}}
-{{- with resources.Get $p -}}
-  {{- $bibliography = . | transform.Unmarshal -}}
-{{- else -}}
-  {{- errorf "Unable to get resource %q" $p -}}
-{{- end -}}
+{{- $bibliography := partialCached "bibliography/bib.html" . -}}
 
 
 {{- /* -------------------- END Bibliography path -------------------- */ -}}

@@ -24,12 +24,7 @@
   {{- end -}}
 {{- end -}}
 
-{{- $bib := dict -}}
-{{- with resources.Get "bibliography.json" -}}
-  {{- $bib = . | transform.Unmarshal -}}
-{{- else -}}
-  {{- errorf "Unable to get resource %q" "bibliography.json" -}}
-{{- end -}}
+{{- $bib := partialCached "bibliography/bib.html" . -}}
 
 {{- $suffixes := partialCached "bibliography/suffixes.html" .Page .Page.Path .Page.Lang -}}
 

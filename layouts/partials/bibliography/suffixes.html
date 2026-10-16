@@ -17,10 +17,7 @@
 
 */ -}}
 
-{{- $bib := slice -}}
-{{- with resources.Get "bibliography.json" -}}
-  {{- $bib = . | transform.Unmarshal -}}
-{{- end -}}
+{{- $bib := partialCached "bibliography/bib.html" . -}}
 
 {{- $works := $bib -}}
 {{- $full := false -}}

@@ -77,8 +77,7 @@
     (rendered after the bibliography) has not added itself to citedBib at this point.
     Collect the cite keys from the page source instead, parsed like the cite shortcode does
     (leading "-" suppresses the author, ";" separates keys). */}}
-  {{- $bib := dict }}
-  {{- with resources.Get "bibliography.json" }}{{ $bib = . | transform.Unmarshal }}{{ end }}
+  {{- $bib := partialCached "bibliography/bib.html" . }}
   {{- range findRESubmatch "{{[<%]-?\\s*citet?\\s+(?:key\\s*=\\s*)?(?:\"([^\"]*)\"|`([^`]*)`|([^\\s\"`>%]+))" $.Page.RawContent }}
     {{- $arg := delimit (after 1 .) "" | replaceRE "^-(.+)" "$1" }}
     {{- range split $arg ";" }}
