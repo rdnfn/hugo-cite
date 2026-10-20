@@ -21,9 +21,8 @@
 
     with a link to the complete reference.
 
-  The bibliography file must be a CSL-JSON, specified either in page’s front-
-  matter with the `bibFile` parameter, or in a leaf bundle, with "bib" in
-  the file name.
+  The bibliography is the site's CSL-JSON file, bibliography.json in assets
+  (see bib.html).
 
 */ -}}
 
@@ -82,29 +81,8 @@
 {{- $partialPath := string (printf "bibliography/%s-style.html" $citationStyle) }}
 {{- /* -------------------- END Citation style -------------------- */ -}}
 
-{{- /* -------------------- BEGIN Bibliography path -------------------- */ -}}
-{{- $bibliographyPath := "" }}
-
-{{- /* Default: check for a JSON file in the leaf bundle. */ -}}
-{{- $pageResource := $.Page.Resources.GetMatch "*bib*.json" -}}
-{{- if $pageResource }}
-{{- $constructedBibResource := printf "content/%s%s" $.Page.File.Dir $pageResource.Name }}
-{{- $bibliographyPath = $constructedBibResource }}
-{{- end }}
-
-{{- /* If a `bibFile` is specified in the page front-matter, it takes precedence
-  over a page resource. */ -}}
-{{- /* `specifiedBib` must be relative to project root */ -}}
-{{- if $.Page.Params.bibFile }}
-{{- $bibliographyPath = $.Page.Params.bibFile -}}
-{{- end }}
-
-{{- if gt (len $bibliographyPath) 0 -}}{{- /* Begin Bibliography Loop */ -}}
-{{/*  UPDATED {{- $bibliography := getJSON $bibliographyPath -}} getJSON was deprecated: see https://gohugo.io/functions/data/getjson/ */}}
+{{- /* CUSTOMIZED PART: always the site's bibliography (bib.html), so pages need no bibFile or bib.json */ -}}
 {{- $bibliography := partialCached "bibliography/bib.html" . -}}
-
-
-{{- /* -------------------- END Bibliography path -------------------- */ -}}
 {{- $suffixes := partialCached "bibliography/suffixes.html" $.Page $.Page.Path $.Page.Lang -}}
 
 {{- /* As in natbib, a work by the same authors (as shown) as the one cited just before
@@ -237,7 +215,6 @@
 
         {{- end }}
         {{- end }}
-      {{- end -}}{{/* End Bibliography Loop */ -}}
 
     {{- /* END loop over keys*/ -}}
     {{- if not $suppressAuthor -}}){{- end -}}</span>{{- /* caution: to ensure correct trim, have no white space / line break after this comment! */ -}}

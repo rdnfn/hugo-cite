@@ -1,0 +1,33 @@
+{{- /*
+
+  The works cited on a page with {{< cite >}} and {{< citet >}}, as a dict by
+  citation key (empty if none). Used by {{< bibliography cited >}}, and by
+  templates that list a page's references after its content, e.g.
+
+  {{ with partial "bibliography/cited.html" .Page }}
+    {{ partial "bibliography/bibliography-list.html" (dict "references" . "page" $.Page) }}
+  {{ end }}
+
+  Context: a page.
+
+*/ -}}
+
+{{- $references := .Scratch.Get "citedBib" }}
+{{- /* CUSTOMIZED PART START: also include cites that have not run yet.
+  Hugo expands shortcodes in the order of the rendered output, so a cite in a footnote
+  (rendered after the bibliography) has not added itself to citedBib at this point.
+  Collect the cite keys from the page source instead, parsed like the cite shortcode does
+  (leading "-" suppresses the author, ";" separates keys). */}}
+{{- $bib := partialCached "bibliography/bib.html" . }}
+{{- range findRESubmatch "{{[<%]-?\\s*citet?\\s+(?:key\\s*=\\s*)?(?:\"([^\"]*)\"|`([^`]*)`|([^\\s\"`>%]+))" .RawContent }}
+  {{- $arg := delimit (after 1 .) "" | replaceRE "^-(.+)" "$1" }}
+  {{- range split $arg ";" }}
+    {{- $key := . }}
+    {{- range where $bib "id" "eq" $key }}
+      {{- $references = merge ($references | default dict) (dict $key .) }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{- /* CUSTOMIZED PART END */}}
+
+{{- return ($references | default dict) }}

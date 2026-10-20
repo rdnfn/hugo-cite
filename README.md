@@ -63,6 +63,8 @@ You must first provide a **[CSL-JSON](https://citeproc-js.readthedocs.io/en/late
 In Zotero for instance, this can be accomplished by selecting the CSL-JSON format when exporting a collection.
 Just include `bib` in the filename (such as `bibliography.json`,`oh-my-bib.json`, or simply `bib.json`) and save it inside your Hugo project directory.
 
+**In this fork**, all shortcodes use one file, `bibliography.json` in the site's assets (see `layouts/partials/bibliography/bib.html`), whatever path, `bibFile` or page bundle file is given: pages need no `bibFile` to cite.
+
 Here is an example:
 
 ```bash
@@ -111,6 +113,14 @@ You can restrict the list only to works cited on the page (with the use of in-te
 <!-- Markdown -->
 
 {{< bibliography cited >}}
+```
+
+To list them from a template instead, e.g. after the content of every page that cites, the `bibliography/cited.html` partial returns the cited works (empty if none):
+
+```go-html-template
+{{ with partial "bibliography/cited.html" .Page }}
+  {{ partial "bibliography/bibliography-list.html" (dict "references" . "page" $.Page) }}
+{{ end }}
 ```
 
 #### File Defined in Front Matter
